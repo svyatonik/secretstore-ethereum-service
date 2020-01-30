@@ -21,7 +21,7 @@ use keccak_hash::keccak;
 use lazy_static::lazy_static;
 use parity_bytes::Bytes;
 use parity_secretstore_primitives::{
-	ServerKeyId, CommonPoint, EncryptedPoint,
+	Public, ServerKeyId,
 	requester::Requester,
 	service::ServiceTask,
 };
@@ -61,8 +61,8 @@ impl DocumentKeyStoreService {
 				ServiceTask::StoreDocumentKey(
 					event.server_key_id,
 					Requester::Address(event.author),
-					CommonPoint::from_slice(&*event.common_point),
-					EncryptedPoint::from_slice(&*event.encrypted_point),
+					Public::from_slice(&*event.common_point),
+					Public::from_slice(&*event.encrypted_point),
 				),
 			)),
 			Err(error) => Err(error.to_string()),
@@ -159,8 +159,8 @@ impl DocumentKeyStoreService {
 			ServiceTask::StoreDocumentKey(
 				key_id,
 				Requester::Address(author),
-				CommonPoint::from_slice(&common_point),
-				EncryptedPoint::from_slice(&encrypted_point),
+				Public::from_slice(&common_point),
+				Public::from_slice(&encrypted_point),
 			),
 		);
 

@@ -24,7 +24,6 @@ use futures::{Stream, StreamExt};
 use ethabi::RawLog;
 use ethereum_types::{Address, H256};
 use parity_bytes::Bytes;
-use parity_crypto::publickey::public_to_address;
 use parity_secretstore_primitives::{
 	KeyServerId,
 	error::Error,
@@ -147,7 +146,7 @@ pub async fn start_service<B, E, TP, KS>(
 {
 	let topics_filter = Arc::new(prepare_topics_filter(&config));
 	let config = Arc::new(config);
-	let key_server_address = public_to_address(&config.blockchain_service_config.self_id);
+	let key_server_address = config.blockchain_service_config.self_id;
 	let transaction_pool = Arc::new(EthereumTransactionPool::new(
 		blockchain.clone(),
 		transaction_pool,

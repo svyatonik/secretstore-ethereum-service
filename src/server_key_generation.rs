@@ -21,7 +21,7 @@ use keccak_hash::keccak;
 use lazy_static::lazy_static;
 use parity_bytes::Bytes;
 use parity_secretstore_primitives::{
-	ServerKey, ServerKeyId,
+	Public, ServerKeyId,
 	requester::Requester,
 	service::ServiceTask,
 };
@@ -109,7 +109,7 @@ impl ServerKeyGenerationService {
 	}
 
 	/// Prepare publish key transaction data.
-	pub fn prepare_pubish_tx_data(key_id: &ServerKeyId, server_key: &ServerKey) -> Bytes {
+	pub fn prepare_pubish_tx_data(key_id: &ServerKeyId, server_key: &Public) -> Bytes {
 		service::functions::server_key_generated::encode_input(
 			*key_id,
 			server_key.as_bytes().to_vec(),

@@ -224,7 +224,9 @@ impl<B, P> parity_secretstore_blockchain_service::TransactionPool<Address>
 		self.submit_response_transaction(
 			&contract_address,
 			|| format!("DocumentKeyCommonRetrievalSuccess({}, {})", key_id, requester),
-			|| requester.address(&key_id)
+			|| requester
+				.address(&key_id)
+				.map_err(Into::into)
 				.and_then(|requester| DocumentKeyShadowRetrievalService::is_response_required(
 					&*self.blockchain,
 					&contract_address,
@@ -233,7 +235,11 @@ impl<B, P> parity_secretstore_blockchain_service::TransactionPool<Address>
 					&self.key_server_address,
 				)),
 			|| serialize_threshold(artifacts.threshold)
-				.and_then(|threshold| requester.address(&key_id).map(|requester| (threshold, requester)))
+				.and_then(|threshold| requester
+					.address(&key_id)
+					.map_err(Into::into)
+					.map(|requester| (threshold, requester))
+				)
 				.map(|(threshold, requester)| DocumentKeyShadowRetrievalService::prepare_pubish_common_tx_data(
 					&key_id,
 					&requester,
@@ -252,7 +258,9 @@ impl<B, P> parity_secretstore_blockchain_service::TransactionPool<Address>
 		self.submit_response_transaction(
 			&contract_address,
 			|| format!("DocumentKeyCommonRetrievalFailure({}, {})", key_id, requester),
-			|| requester.address(&key_id)
+			|| requester
+				.address(&key_id)
+				.map_err(Into::into)
 				.and_then(|requester| DocumentKeyShadowRetrievalService::is_response_required(
 					&*self.blockchain,
 					&contract_address,
@@ -260,7 +268,9 @@ impl<B, P> parity_secretstore_blockchain_service::TransactionPool<Address>
 					&requester,
 					&self.key_server_address,
 				)),
-			|| requester.address(&key_id)
+			|| requester
+				.address(&key_id)
+				.map_err(Into::into)
 				.map(|requester|
 					DocumentKeyShadowRetrievalService::prepare_error_tx_data(&key_id, &requester)
 				),
@@ -277,7 +287,9 @@ impl<B, P> parity_secretstore_blockchain_service::TransactionPool<Address>
 		self.submit_response_transaction(
 			&contract_address,
 			|| format!("DocumentKeyPersonalRetrievalSuccess({}, {})", key_id, requester),
-			|| requester.address(&key_id)
+			|| requester
+				.address(&key_id)
+				.map_err(Into::into)
 				.and_then(|requester| DocumentKeyShadowRetrievalService::is_response_required(
 					&*self.blockchain,
 					&contract_address,
@@ -285,17 +297,27 @@ impl<B, P> parity_secretstore_blockchain_service::TransactionPool<Address>
 					&requester,
 					&self.key_server_address,
 				)),
-			|| requester
-				.address(&key_id)
-				.and_then(|requester| DocumentKeyShadowRetrievalService::prepare_pubish_personal_tx_data(
-					&*self.blockchain,
-					&contract_address,
-					&key_id,
-					&requester,
-					&artifacts.participants[..],
-					artifacts.decrypted_secret,
-					artifacts.shadow,
-				)),
+			|| {
+				let self_coefficient = artifacts
+					.participants_coefficients
+					.get(&self.key_server_address)
+					.cloned()
+					.ok_or_else(|| String::from(
+						"DocumentKeyPersonalRetrieval session has completed without self coefficient",
+					))?;
+				requester
+					.address(&key_id)
+					.map_err(Into::into)
+					.and_then(|requester| DocumentKeyShadowRetrievalService::prepare_pubish_personal_tx_data(
+						&*self.blockchain,
+						&contract_address,
+						&key_id,
+						&requester,
+						&artifacts.participants_coefficients.keys().cloned().collect::<Vec<_>>()[..],
+						artifacts.encrypted_document_key,
+						self_coefficient,
+					))
+			},
 		)
 	}
 
@@ -308,7 +330,9 @@ impl<B, P> parity_secretstore_blockchain_service::TransactionPool<Address>
 		self.submit_response_transaction(
 			&contract_address,
 			|| format!("DocumentKeyPersonalRetrievalFailure({}, {})", key_id, requester),
-			|| requester.address(&key_id)
+			|| requester
+				.address(&key_id)
+				.map_err(Into::into)
 				.and_then(|requester| DocumentKeyShadowRetrievalService::is_response_required(
 					&*self.blockchain,
 					&contract_address,
@@ -316,7 +340,9 @@ impl<B, P> parity_secretstore_blockchain_service::TransactionPool<Address>
 					&requester,
 					&self.key_server_address,
 				)),
-			|| requester.address(&key_id)
+			|| requester
+				.address(&key_id)
+				.map_err(Into::into)
 				.map(|requester|
 					DocumentKeyShadowRetrievalService::prepare_error_tx_data(&key_id, &requester)
 				),

@@ -22,8 +22,7 @@ use lazy_static::lazy_static;
 use parity_bytes::Bytes;
 use parity_crypto::publickey::{Public, public_to_address};
 use parity_secretstore_primitives::{
-	ServerKeyId, CommonPoint,
-	DecryptedSecret, DocumentKeyShadow,
+	ServerKeyId,
 	requester::Requester,
 };
 use crate::{
@@ -130,7 +129,7 @@ impl DocumentKeyShadowRetrievalService {
 	pub fn prepare_pubish_common_tx_data(
 		key_id: &ServerKeyId,
 		requester: &Address,
-		common_point: &CommonPoint,
+		common_point: &Public,
 		threshold: U256,
 	) -> Bytes {
 		service::functions::document_key_common_retrieved::encode_input(
@@ -148,8 +147,8 @@ impl DocumentKeyShadowRetrievalService {
 		key_id: &ServerKeyId,
 		requester: &Address,
 		participants: &[Address],
-		decrypted_secret: DecryptedSecret,
-		shadow: DocumentKeyShadow,
+		decrypted_secret: Public,
+		shadow: Vec<u8>,
 	) -> Result<Bytes, String> {
 		let mut participants_mask = U256::default();
 		for participant in participants {
