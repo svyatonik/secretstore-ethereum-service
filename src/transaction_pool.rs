@@ -108,7 +108,7 @@ impl<B, P> EthereumTransactionPool<B, P>
 	}
 }
 
-impl<B, P> parity_secretstore_blockchain_service::TransactionPool<Address>
+impl<B, P> parity_secretstore_blockchain_service::TransactionPool
 	for
 		EthereumTransactionPool<B, P>
 	where

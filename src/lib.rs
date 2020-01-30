@@ -44,7 +44,7 @@ pub use parity_secretstore_blockchain_service::{
 	Executor,
 };
 
-pub type BlockchainServiceTask = parity_secretstore_blockchain_service::BlockchainServiceTask<Address>;
+pub type BlockchainServiceTask = parity_secretstore_blockchain_service::BlockchainServiceTask;
 
 mod document_key_shadow_retrieval;
 mod document_key_store;
@@ -190,7 +190,6 @@ impl<B: Blockchain> EthereumBlock<B> {
 }
 
 impl<B: Blockchain> parity_secretstore_blockchain_service::Block for EthereumBlock<B> {
-	type Origin = Address;
 	type NewBlocksIterator = Box<dyn Iterator<Item = BlockchainServiceTask>>;
 	type PendingBlocksIterator = Box<dyn Iterator<Item = BlockchainServiceTask>>;
 
