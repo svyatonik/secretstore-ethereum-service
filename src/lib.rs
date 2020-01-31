@@ -28,6 +28,7 @@ use parity_secretstore_primitives::{
 	KeyServerId,
 	error::Error,
 	key_server::KeyServer,
+	service::ServiceTasksListenerRegistrar,
 };
 use crate::{
 	document_key_shadow_retrieval::DocumentKeyShadowRetrievalService,
@@ -131,8 +132,9 @@ struct EthereumBlock<B> {
 }
 
 /// Start listening requests from given contract.
-pub async fn start_service<B, E, TP, KS>(
+pub async fn start_service<B, E, TP, KS, LR>(
 	key_server: Arc<KS>,
+	listener_registrar: Arc<LR>,
 	blockchain: Arc<B>,
 	executor: Arc<E>,
 	transaction_pool: Arc<TP>,
@@ -142,6 +144,7 @@ pub async fn start_service<B, E, TP, KS>(
 	B: Blockchain,
 	E: Executor,
 	TP: TransactionPool,
+	LR: ServiceTasksListenerRegistrar,
 	KS: KeyServer,
 {
 	let topics_filter = Arc::new(prepare_topics_filter(&config));
@@ -154,6 +157,7 @@ pub async fn start_service<B, E, TP, KS>(
 	));
 	parity_secretstore_blockchain_service::start_service(
 		key_server,
+		listener_registrar,
 		executor,
 		transaction_pool,
 		config.blockchain_service_config.clone(),
