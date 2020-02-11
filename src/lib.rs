@@ -1,5 +1,3 @@
-// TODO: disable process of new blocks until previous blocks are processed (i.e. there should be a queue with max 1 item)
-
 // Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity Secret Store.
 
@@ -27,6 +25,7 @@ use parity_bytes::Bytes;
 use parity_secretstore_primitives::{
 	KeyServerId,
 	error::Error,
+	executor::Executor,
 	key_server::KeyServer,
 	service::ServiceTasksListenerRegistrar,
 };
@@ -42,7 +41,6 @@ use crate::{
 // hide blockchain-service dependency
 pub use parity_secretstore_blockchain_service::{
 	Configuration as BlockchainServiceConfiguration,
-	Executor,
 };
 
 pub type BlockchainServiceTask = parity_secretstore_blockchain_service::BlockchainServiceTask;
